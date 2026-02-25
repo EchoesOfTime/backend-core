@@ -1,0 +1,77 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'jacoco'
+}
+
+group = 'ru.mentee.power'
+version = '1.0-SNAPSHOT'
+
+ext {
+    junitVersion = '5.11.0'
+    assertjVersion = '3.26.3'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter' //?
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+checkstyle {
+    toolVersion = '10.12.4'
+    maxErrors = 0
+    maxWarnings = 999
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+
+    tasks.withType(Checkstyle) {
+        group = 'verification'
+    }
+    check.dependsOn checkstyleMain, checkstyleTest
+}
+
+jacoco {
+    toolVersion = '0.8.14'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html')
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.50
+            }
+        }
+    }
+}
+
+check {
+    dependsOn jacocoTestCoverageVerification
+}

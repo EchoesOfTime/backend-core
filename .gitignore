@@ -1,0 +1,20 @@
+### Gradle Wrapper ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+### IntelliJ IDEA ###
+git.txt
+.idea/
+*.iml
+out/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+
+# JTE generated classes
+jte-classes/
+*.generated.java
+*.generated.class
