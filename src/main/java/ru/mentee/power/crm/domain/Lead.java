@@ -3,7 +3,27 @@ package ru.mentee.power.crm.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Lead {
+public record Lead(UUID id, Contact contact, String company, String status) {
+
+  public Lead {
+    if (id == null) {
+      throw new IllegalArgumentException("id cannot be null");
+    }
+    if (contact == null) {
+      throw new IllegalArgumentException("Contact cannot be null");
+    }
+    if (company == null || company.isBlank()) {
+      throw new IllegalArgumentException("Company cannot be blank");
+    }
+    if (status == null || status.isBlank()) {
+      throw new IllegalArgumentException("Status cannot be blank");
+    }
+    if (!status.equals("NEW") && !status.equals("QUALIFIED") && !status.equals("CONVERTED")) {
+      throw new IllegalArgumentException("Status must be one of: NEW, QUALIFIED, CONVERTED.   Got: "
+          + status);
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -19,45 +39,5 @@ public class Lead {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  private UUID id;
-  private String email;
-  private String phone;
-  private String company;
-  private String status;
-
-  public Lead (UUID id, String email, String phone, String company, String status) {
-    this.id = id;
-    this.email = email;
-    this.phone = phone;
-    this.company = company;
-    this.status = status;
-  }
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public String getPhone() {
-    return phone;
-  }
-
-  public String getCompany() {
-    return company;
-  }
-
-  public String getStatus() {
-    return status;
-  }
-
-  @Override
-  public String toString() {
-    return "Lead{id='" + id + "', email='" + email + "', phone='"
-        + phone + "', company='" + company + "', status='" + status + "'}";
   }
 }
