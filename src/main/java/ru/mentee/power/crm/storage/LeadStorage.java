@@ -49,6 +49,7 @@ public class LeadStorage {
       }
     }
     return count;
+
   }
 
   public Lead findById(UUID id) {
