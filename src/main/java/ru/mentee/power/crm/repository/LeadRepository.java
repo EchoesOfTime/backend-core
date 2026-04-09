@@ -1,41 +1,20 @@
 package ru.mentee.power.crm.repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import ru.mentee.power.crm.model.Lead;
 
-public class LeadRepository {
-  private final Map<String, Lead> storage = new HashMap<>();
+public interface LeadRepository {
 
-  public void save(Lead lead) {
-    if (lead == null) {
-      throw new IllegalArgumentException("Lead cannot be null");
-    }
-    storage.put(lead.id(), lead);
-  }
+  Lead save(Lead lead);
 
-  public Lead findById(String id) {
-    if (id == null) {
-      throw new IllegalArgumentException("Id cannot be null");
-    }
-    return storage.get(id);
-  }
+  Optional<Lead> findById(UUID id);
 
-  public List<Lead> findAll() {
-    return new ArrayList<>(storage.values());
-  }
+  Optional<Lead> findByEmail(String email);
 
-  public void delete(String id) {
-    if (id == null) {
-      throw new IllegalArgumentException("Id cannot be null");
-    }
-    storage.remove(id);
-  }
+  List<Lead> findAll();
 
-  public int size() {
-    return storage.size();
-  }
+  void delete(UUID id);
 }

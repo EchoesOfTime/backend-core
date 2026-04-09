@@ -7,29 +7,24 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.mentee.power.crm.domain.Address;
-import ru.mentee.power.crm.domain.Contact;
-import ru.mentee.power.crm.domain.Lead;
+import ru.mentee.power.crm.model.Lead;
+import ru.mentee.power.crm.model.LeadStatus;
 
 class InMemoryLeadRepositoryTest {
 
   private InMemoryLeadRepository repository;
-  private Address address;
-  private Contact contact;
 
   @BeforeEach
   void setUp() {
     repository = new InMemoryLeadRepository();
-    address = new Address("San Francisco", "123 Main St", "94105");
-    contact = new Contact("john@example.com", "+7 954 685 23 65", address);
   }
 
   @Test
   void shouldAddLeadAndFindItById() {
     UUID leadId = UUID.randomUUID();
-    Lead lead = new Lead(leadId, contact, "Test Company", "NEW");
+    Lead lead = new Lead(leadId, "john@example.com", "Test Company", LeadStatus.NEW);
 
-    repository.add(lead);
+    repository.save(lead);
 
     assertThat(repository.findAll()).hasSize(1).containsExactly(lead);
     assertThat(repository.findById(leadId)).isPresent().contains(lead);
@@ -38,8 +33,9 @@ class InMemoryLeadRepositoryTest {
   @Test
   void shouldReturnEmptyOptionalWhenFindingNonExistentLead() {
     for (int i = 0; i < 10; i++) {
-      Lead lead = new Lead(UUID.randomUUID(), contact, "Company " + i, "NEW");
-      repository.add(lead);
+      Lead lead = new Lead(UUID.randomUUID(), "user"
+          + i + "@example.com", "Company " + i, LeadStatus.NEW);
+      repository.save(lead);
     }
 
     UUID nonExistentId = UUID.randomUUID();
@@ -49,15 +45,17 @@ class InMemoryLeadRepositoryTest {
   }
 
   @Test
-  void shouldNotAddDuplicateLeadWithSameUuid() {
+  void shouldOverwriteLeadWhenSavingWithSameId() {
     UUID leadId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-    Lead lead1 = new Lead(leadId, contact, "Company1", "NEW");
-    repository.add(lead1);
+    Lead lead1 = new Lead(leadId, "company1@example.com", "Company1", LeadStatus.NEW);
+    repository.save(lead1);
 
-    Lead lead2 = new Lead(leadId, contact, "Company2", "QUALIFIED");
-    repository.add(lead2);
+    Lead lead2 = new Lead(leadId, "company2@example.com", "Company2", LeadStatus.QUALIFIED);
+    repository.save(lead2);
 
-    assertThat(repository.findAll()).hasSize(1).containsExactly(lead1);
+    assertThat(repository.findAll()).hasSize(1).containsExactly(lead2);
+    assertThat(repository.findByEmail("company1@example.com")).isPresent().contains(lead2);
+    assertThat(repository.findByEmail("company2@example.com")).isPresent().contains(lead2);
   }
 
   @Test
@@ -68,19 +66,19 @@ class InMemoryLeadRepositoryTest {
     UUID fourthLeadId = UUID.randomUUID();
     UUID fifthLeadId = UUID.randomUUID();
 
-    Lead lead1 = new Lead(firstLeadId, contact, "Company1", "NEW");
-    Lead lead2 = new Lead(secondLeadId, contact, "Company2", "NEW");
-    Lead lead3 = new Lead(thirdLeadId, contact, "Company3", "NEW");
-    Lead lead4 = new Lead(fourthLeadId, contact, "Company4", "NEW");
-    Lead lead5 = new Lead(fifthLeadId, contact, "Company5", "NEW");
+    Lead lead1 = new Lead(firstLeadId, "company1@example.com", "Company1", LeadStatus.NEW);
+    Lead lead2 = new Lead(secondLeadId, "company2@example.com", "Company2", LeadStatus.NEW);
+    Lead lead3 = new Lead(thirdLeadId, "company3@example.com", "Company3", LeadStatus.NEW);
+    Lead lead4 = new Lead(fourthLeadId, "company4@example.com", "Company4", LeadStatus.NEW);
+    Lead lead5 = new Lead(fifthLeadId, "company5@example.com", "Company5", LeadStatus.NEW);
 
-    repository.add(lead1);
-    repository.add(lead2);
-    repository.add(lead3);
-    repository.add(lead4);
-    repository.add(lead5);
+    repository.save(lead1);
+    repository.save(lead2);
+    repository.save(lead3);
+    repository.save(lead4);
+    repository.save(lead5);
 
-    repository.remove(thirdLeadId);  // удаляем 3 лид
+    repository.delete(thirdLeadId);  // удаляем 3 лид
 
     assertThat(repository.findAll()).hasSize(4)
         .containsExactlyInAnyOrder(lead1, lead2, lead4, lead5).doesNotContain(lead3);
@@ -93,11 +91,11 @@ class InMemoryLeadRepositoryTest {
 
   @Test
   void shouldReturnDefensiveCopyThatDoesNotAffectInternalStorage() {
-    Lead lead1 = new Lead(UUID.randomUUID(), contact, "Company1", "NEW");
-    Lead lead2 = new Lead(UUID.randomUUID(), contact, "Company2", "NEW");
+    Lead lead1 = new Lead(UUID.randomUUID(), "company1@example.com", "Company1", LeadStatus.NEW);
+    Lead lead2 = new Lead(UUID.randomUUID(), "company2@example.com", "Company2", LeadStatus.NEW);
 
-    repository.add(lead1);
-    repository.add(lead2);
+    repository.save(lead1);
+    repository.save(lead2);
 
     List<Lead> returnedList = repository.findAll();
     returnedList.remove(0);
