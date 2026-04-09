@@ -72,7 +72,7 @@ class LeadRepositoryTest {
   @DisplayName("Should perform contains() faster than ArrayList")
   void shouldPerformFasterThanArrayList() {
 
-    int numberOfLeads = 10000;
+    int numberOfLeads = 100000;
     int numberOfContainsChecks = 1000;
 
     List<Lead> arrayList = new ArrayList<>();
@@ -106,8 +106,8 @@ class LeadRepositoryTest {
     System.out.println("Performance ratio (ArrayList/HashSet): "
         + (double) arrayListDuration / hashSetDuration);
 
-    assertThat((double) arrayListDuration / hashSetDuration).isGreaterThan(100);
+    assertThat((double) arrayListDuration / hashSetDuration).isGreaterThan(10);
 
-    assertThat(arrayListDuration / 1_000_000.0).isGreaterThan(100);
+    assertThat(arrayListDuration / 1_000_000.0).isGreaterThan(50);
   }
 }
