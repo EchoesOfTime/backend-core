@@ -33,9 +33,7 @@ dependencies {
 
     // Mockito для тестов
     testImplementation 'org.mockito:mockito-core:5.23.0'
-    //testImplementation 'org.mockito:mockito-core:5.14.2' //Java 21
     testImplementation 'org.mockito:mockito-junit-jupiter:5.23.0'
-    //testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2' //Java 21
 }
 
 checkstyle {
