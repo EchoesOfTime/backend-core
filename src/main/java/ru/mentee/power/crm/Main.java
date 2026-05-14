@@ -24,6 +24,8 @@ public class Main {
     leadService.addLead("alice.brown@example.com", "Enterprise Co", LeadStatus.NEW);
     leadService.addLead("charlie.davis@example.com", "Ventures LLC", LeadStatus.LOST);
 
+    leadService.addLead("<script>alert('XSS')</script>", "XSS Test Company", LeadStatus.NEW);
+
     Tomcat tomcat = new Tomcat();
     tomcat.setPort(8080);
     tomcat.getConnector();

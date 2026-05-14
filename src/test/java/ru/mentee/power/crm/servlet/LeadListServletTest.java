@@ -2,7 +2,6 @@ package ru.mentee.power.crm.servlet;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,11 +72,10 @@ class LeadListServletTest {
 
     when(servletContext.getAttribute("leadService")).thenReturn(leadService);
     when(leadService.findAll()).thenReturn(leads);
-    LeadListServlet spyServlet = spy(servlet);
-    when(spyServlet.getServletContext()).thenReturn(servletContext);
+    when(servlet.getServletContext()).thenReturn(servletContext);
 
     // When
-    spyServlet.doGet(request, response);
+    servlet.doGet(request, response);
 
     // Then
     verify(leadService, times(1)).findAll();
@@ -87,14 +85,14 @@ class LeadListServletTest {
     String htmlOutput = stringWriter.toString();
 
     assertTrue(htmlOutput.contains("<!DOCTYPE html>"));
-    assertTrue(htmlOutput.contains("<html>"));
-    assertTrue(htmlOutput.contains("<head><title>CRM - Lead List</title></head>"));
-    assertTrue(htmlOutput.contains("<h1>Lead List</h1>"));
+    assertTrue(htmlOutput.contains("<html"));
+    assertTrue(htmlOutput.contains("CRM System"));
+    assertTrue(htmlOutput.contains("Lead List"));
 
-    assertTrue(htmlOutput.contains("<table border='1'>"));
-    assertTrue(htmlOutput.contains("<th>Email</th>"));
-    assertTrue(htmlOutput.contains("<th>Company</th>"));
-    assertTrue(htmlOutput.contains("<th>Status</th>"));
+    assertTrue(htmlOutput.contains("<table"));
+    assertTrue(htmlOutput.contains("Email"));
+    assertTrue(htmlOutput.contains("Company"));
+    assertTrue(htmlOutput.contains("Status"));
 
     assertTrue(htmlOutput.contains("john@example.com"));
     assertTrue(htmlOutput.contains("Company A"));
@@ -109,7 +107,7 @@ class LeadListServletTest {
     assertTrue(htmlOutput.contains("QUALIFIED"));
 
     assertTrue(htmlOutput.contains("</tbody>"));
-    assertTrue(htmlOutput.contains("</table>"));
+    assertTrue(htmlOutput.contains("</table"));
     assertTrue(htmlOutput.contains("</body>"));
     assertTrue(htmlOutput.contains("</html>"));
   }
@@ -167,6 +165,10 @@ class LeadListServletTest {
     printWriter.flush();
     String htmlOutput = stringWriter.toString();
 
-    assertTrue(htmlOutput.contains("<td>null</td>") || htmlOutput.contains("<td></td>"));
+    assertTrue(
+        htmlOutput.contains("class=\"px-4 py-2\">null</td>")
+            || htmlOutput.contains("class=\"px-4 py-2\"></td>")
+            || htmlOutput.contains("class=\"px-4 py-2\"> </td>")
+    );
   }
 }
