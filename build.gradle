@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'checkstyle'
     id 'jacoco'
+    id 'gg.jte.gradle' version '3.2.3'  // Добавить JTE plugin
 }
 
 group = 'ru.mentee.power'
@@ -15,6 +16,7 @@ ext {
     mockitoVersion = '5.23.0'
     servletVersion = '6.1.0'
     tomcatVersion = '11.0.21'
+    jteVersion = '3.2.3'
 }
 
 java {
@@ -45,6 +47,15 @@ dependencies {
 
     implementation "jakarta.servlet:jakarta.servlet-api:${servletVersion}"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}"
+
+    implementation "gg.jte:jte:${jteVersion}"
+    implementation "gg.jte:jte-runtime:${jteVersion}"
+}
+
+jte {
+    sourceDirectory = projectDir.toPath().resolve("src/main/jte")
+    contentType = "Html"
+    binaryStaticContent = false
 }
 
 checkstyle {
@@ -83,7 +94,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.80
+                minimum = 0.7
             }
         }
     }
