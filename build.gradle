@@ -4,6 +4,8 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'gg.jte.gradle' version '3.2.3'  // Добавить JTE plugin
+    id 'org.springframework.boot' version '4.1.0-RC1'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ru.mentee.power'
@@ -17,6 +19,7 @@ ext {
     servletVersion = '6.1.0'
     tomcatVersion = '11.0.21'
     jteVersion = '3.2.3'
+    springBootVersion = '4.1.0-RC1'
 }
 
 java {
@@ -50,6 +53,26 @@ dependencies {
 
     implementation "gg.jte:jte:${jteVersion}"
     implementation "gg.jte:jte-runtime:${jteVersion}"
+
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+}
+
+bootRun {
+    mainClass = 'ru.mentee.power.crm.spring.Application'
+    args = ['--server.port=8081']
+}
+
+bootJar {
+    archiveClassifier = 'spring-boot'
+    exclude 'ru/mentee/power/crm/Main.class'
+}
+
+jar {
+    archiveClassifier = ''
+    manifest {
+        attributes 'Main-Class': 'ru.mentee.power.crm.Main'
+    }
+    exclude 'ru/mentee/power/crm/spring/Application.class'
 }
 
 jte {
