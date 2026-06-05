@@ -1,16 +1,6 @@
 package ru.mentee.power.crm;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.startup.Tomcat;
-import org.junit.jupiter.api.*;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import ru.mentee.power.crm.infrastructure.InMemoryLeadRepository;
-import ru.mentee.power.crm.model.LeadStatus;
-import ru.mentee.power.crm.repository.LeadRepository;
-import ru.mentee.power.crm.servlet.LeadListServlet;
-import ru.mentee.power.crm.service.LeadService;
-import ru.mentee.power.crm.spring.Application;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.io.File;
 import java.net.URI;
@@ -18,7 +8,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import org.apache.catalina.Context;
+import org.apache.catalina.startup.Tomcat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import ru.mentee.power.crm.infrastructure.InMemoryLeadRepository;
+import ru.mentee.power.crm.model.LeadStatus;
+import ru.mentee.power.crm.repository.LeadRepository;
+import ru.mentee.power.crm.service.LeadService;
+import ru.mentee.power.crm.servlet.LeadListServlet;
+import ru.mentee.power.crm.spring.Application;
 
 /**
  * Интеграционный тест сравнения Servlet и Spring Boot стеков.
@@ -60,8 +64,8 @@ class StackComparisonTest {
 
     context.getServletContext().setAttribute("leadService", leadService);
 
-    Tomcat.addServlet(context,"LeadListServlet", new LeadListServlet());
-    context.addServletMappingDecoded("/leads","LeadListServlet");
+    Tomcat.addServlet(context, "LeadListServlet", new LeadListServlet());
+    context.addServletMappingDecoded("/leads", "LeadListServlet");
 
     long servletStart = System.nanoTime();
     servletTomcat.start();
@@ -81,11 +85,14 @@ class StackComparisonTest {
   static void stopServers() throws Exception {
 
     // Останавливаем Embedded Tomcat
-    if (servletTomcat != null) {servletTomcat.stop();servletTomcat.destroy();
+    if (servletTomcat != null) {
+      servletTomcat.stop();
+      servletTomcat.destroy();
     }
 
     // Останавливаем Spring Boot
-    if (springContext != null) {springContext.close();
+    if (springContext != null) {
+      springContext.close();
     }
   }
 
@@ -98,11 +105,15 @@ class StackComparisonTest {
   @DisplayName("Оба стека должны возвращать лидов в HTML таблице")
   void shouldReturnLeadsFromBothStacks() throws Exception {
 
-    HttpRequest servletRequest = HttpRequest.newBuilder().uri(URI.create("http://localhost:" + SERVLET_PORT + "/leads")).GET().build();
-    HttpRequest springRequest = HttpRequest.newBuilder().uri(URI.create("http://localhost:" + SPRING_PORT + "/leads")).GET().build();
+    HttpRequest servletRequest = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:" + SERVLET_PORT + "/leads")).GET().build();
+    HttpRequest springRequest = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:" + SPRING_PORT + "/leads")).GET().build();
 
-    HttpResponse<String> servletResponse = httpClient.send(servletRequest, HttpResponse.BodyHandlers.ofString());
-    HttpResponse<String> springResponse = httpClient.send(springRequest, HttpResponse.BodyHandlers.ofString());
+    HttpResponse<String> servletResponse = httpClient.send(
+        servletRequest, HttpResponse.BodyHandlers.ofString());
+    HttpResponse<String> springResponse = httpClient.send(
+        springRequest, HttpResponse.BodyHandlers.ofString());
 
     assertThat(servletResponse.statusCode()).isEqualTo(200);
     assertThat(springResponse.statusCode()).isEqualTo(200);
@@ -127,14 +138,17 @@ class StackComparisonTest {
 
   @Test
   @DisplayName("Измерение времени старта обоих стеков")
-  void shouldMeasureStartupTime() throws Exception{
+  void shouldMeasureStartupTime() throws Exception {
     long servletStartupMs = measureServletStartup();
     long springStartupMs = measureSpringBootStartup();
 
     System.out.println("=== Сравнение времени старта ===");
     System.out.printf("Servlet стек: %d ms%n", servletStartupMs);
     System.out.printf("Spring Boot: %d ms%n", springStartupMs);
-    System.out.printf("Разница: Spring %s на %d ms%n", springStartupMs > servletStartupMs ? "медленнее" : "быстрее", Math.abs(springStartupMs - servletStartupMs));
+    System.out.printf("Разница: Spring %s на %d ms%n", springStartupMs > servletStartupMs
+        ? "медленнее"
+        : "быстрее"
+        , Math.abs(springStartupMs - servletStartupMs));
 
     assertThat(servletStartupMs).isLessThan(10_000);
     assertThat(springStartupMs).isLessThan(15_000);
