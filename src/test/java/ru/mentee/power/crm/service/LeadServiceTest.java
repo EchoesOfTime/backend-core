@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,5 +109,144 @@ class LeadServiceTest {
 
     // Проверяем общее количество
     assertThat(service.findAll()).hasSize(7);
+  }
+
+  @Test
+  void shouldReturnOnlyNewLeadsWhenFindByStatusNew() {
+    // Given
+    LeadRepository testRepository = new InMemoryLeadRepository();
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new1@example.com", "Company A", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new2@example.com", "Company B", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new3@example.com", "Company C", LeadStatus.NEW));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted1@example.com", "Company D", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted2@example.com", "Company E", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted3@example.com", "Company F", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted4@example.com", "Company G", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted5@example.com", "Company H", LeadStatus.CONTACTED));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified1@example.com", "Company I", LeadStatus.QUALIFIED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified2@example.com", "Company J", LeadStatus.QUALIFIED));
+
+    LeadService leadService = new LeadService(testRepository);
+
+    // When
+    List<Lead> result = leadService.findByStatus(LeadStatus.NEW);
+
+    // Then
+    assertThat(result).hasSize(3);
+    assertThat(result).allMatch(lead -> lead.status().equals(LeadStatus.NEW));
+  }
+
+  @Test
+  void shouldReturnEmptyListWhenNoLeadsWithStatusQUALIFIED() {
+    // Given:
+    LeadRepository testRepository = new InMemoryLeadRepository();
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new1@example.com", "Company A", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new2@example.com", "Company B", LeadStatus.NEW));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted1@example.com", "Company C", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted2@example.com", "Company D", LeadStatus.CONTACTED));
+
+    LeadService testService = new LeadService(testRepository);
+
+    // When:
+    List<Lead> result = testService.findByStatus(LeadStatus.QUALIFIED);
+
+    // Then:
+    assertThat(result).isEmpty();
+    assertThat(result).hasSize(0);
+  }
+
+  @Test
+  void shouldReturnOnlyContactedLeadsWhenFindByStatusContacted() {
+    // Given
+    LeadRepository testRepository = new InMemoryLeadRepository();
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new1@example.com", "Company A", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new2@example.com", "Company B", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new3@example.com", "Company C", LeadStatus.NEW));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted1@example.com", "Company D", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted2@example.com", "Company E", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted3@example.com", "Company F", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted4@example.com", "Company G", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted5@example.com", "Company H", LeadStatus.CONTACTED));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified1@example.com", "Company I", LeadStatus.QUALIFIED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified2@example.com", "Company J", LeadStatus.QUALIFIED));
+
+    LeadService leadService = new LeadService(testRepository);
+
+    // When
+    List<Lead> result = leadService.findByStatus(LeadStatus.CONTACTED);
+
+    // Then
+    assertThat(result).hasSize(5);
+    assertThat(result).allMatch(lead -> lead.status().equals(LeadStatus.CONTACTED));
+  }
+
+  @Test
+  void shouldReturnOnlyQualifiedLeadsWhenFindByStatusQualified() {
+    // Given
+    LeadRepository testRepository = new InMemoryLeadRepository();
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new1@example.com", "Company A", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new2@example.com", "Company B", LeadStatus.NEW));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "new3@example.com", "Company C", LeadStatus.NEW));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted1@example.com", "Company D", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted2@example.com", "Company E", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted3@example.com", "Company F", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted4@example.com", "Company G", LeadStatus.CONTACTED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "contacted5@example.com", "Company H", LeadStatus.CONTACTED));
+
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified1@example.com", "Company I", LeadStatus.QUALIFIED));
+    testRepository.save(new Lead(
+        UUID.randomUUID(), "qualified2@example.com", "Company J", LeadStatus.QUALIFIED));
+
+    LeadService leadService = new LeadService(testRepository);
+
+    // When
+    List<Lead> result = leadService.findByStatus(LeadStatus.QUALIFIED);
+
+    // Then
+    assertThat(result).hasSize(2);
+    assertThat(result).allMatch(lead -> lead.status().equals(LeadStatus.QUALIFIED));
   }
 }
