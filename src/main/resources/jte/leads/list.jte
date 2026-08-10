@@ -23,6 +23,12 @@
                class="px-4 py-2 rounded ${currentFilter == ru.mentee.power.crm.model.LeadStatus.QUALIFIED ? "bg-blue-500 text-white" : "bg-gray-200"}">
               QUALIFIED
           </a>
+          <a
+            href="/leads/new"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            + Добавить лида
+          </a>
         </div>
 
         @if(currentFilter != null)
